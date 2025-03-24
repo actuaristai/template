@@ -1,0 +1,180 @@
+# to install just: run this in powershell:
+# winget install --id Casey.Just --exact
+
+set shell:= ["pwsh.exe", "-c"]
+
+PROJECT_NAME:= "template"
+REMOTE_REPO := "git@github.com:actuaristai/template.git"
+PYTHONVERSION := "3.11.5"
+
+
+POWERSHELL_SHEBANG := if os() == 'windows' {
+  'powershell.exe'
+} else {
+  '/usr/bin/env pwsh'
+}
+
+###
+### start with these commands
+# just (will list out all the available just commands)
+# just init-git (Only need to do once)
+# just init-project (init-env, init-pre-commit, init-dvc)
+# just lint (ruff)
+# just test (pytest)
+# just run (dvc repro)
+# just docs (quarto)
+
+
+# Initial help file
+help:
+	just --list --unsorted
+
+# Regular commands to run
+# ------------------------------------------
+
+# build api documentation using quarto and render
+_docs-build:
+	# uv run quartodoc build
+	uv run quarto render
+
+# build docs and preview using quarto
+docs: _docs-build
+	uv run quarto preview
+
+# Lint using ruff
+lint: 
+	uv run ruff check src/{{PROJECT_NAME}} --fix
+	uv run ruff check tests --fix
+
+# test using pytest
+test:
+	uv run pytest --cov-report term-missing --cov={{PROJECT_NAME}} -v -p no:faulthandler -W ignore::DeprecationWarning --verbose --doctest-modules
+
+# reproduce dvc pipeline
+run:
+	uv run dvc repro
+
+# update template using copier. 
+update-template *COPIER_OPTIONS:
+	#!{{POWERSHELL_SHEBANG}}
+	if(git status --porcelain |Where {$_ -match '^\?\?'}){
+		# untracked files exist: Untracked files are prefixed with the status ??, so you can easily filter those out
+		# and then check if there are uncommitted changes based on whether there is any output left:
+		echo 'Error: untracked files exist. Please commit or remove them before updating template'
+	} 
+	elseif(git status --porcelain |Where {$_ -notmatch '^\?\?'}) {
+		# uncommitted changes
+		echo 'Error: uncommitted changes exist. Please commit or remove them before updating template'
+	}
+	else {
+		# tree is clean
+		uvx copier copy git@github.com:actuaristai/template.git . --trust --data 'auto_run_setup=no'
+	}
+
+# Initialisations - only need to be run once
+# ------------------------------------------
+
+# set up all to start up a project
+_init-all: init-git init-project lint test _docs-build init-git-push
+
+# set up project (after cloning existing repository)
+init-project: init-env init-pre-commit init-dvc
+
+# initialise git. can alter REMOTE_REPO argument
+init-git:
+	git init --initial-branch=develop && git remote add origin {{REMOTE_REPO}}
+	git add .
+	git commit -m 'feat: Initial commit'
+
+# push initial git to remote (developers can submit first push. develop should be default branch)
+init-git-push:
+	git add .
+	git commit -m 'feat: add dvc and qmd initialisations'
+	git push -u origin develop
+	git checkout -b main
+	git push -u origin main
+
+# set up environment using uv and set up ipykernel in project name
+init-env:
+	uv sync
+	uv run python -m ipykernel install --user --name {{PROJECT_NAME}}
+
+# pre-commit
+init-pre-commit:
+	uvx pre-commit install --hook-type pre-commit --hook-type commit-msg
+    uvx pre-commit autoupdate
+	uvx pre-commit run --all-files
+
+# set up dvc
+init-dvc:
+	uv run dvc init
+	@echo "To setup dvc remote, enter AZURE_SECRET in environment or .secrets.toml and run: just init-dvc-remote"
+
+
+# set up dvc remote. ensure AZURE_SECRET is in environment or in .secrets.toml file
+init-dvc-remote:
+	#!{{POWERSHELL_SHEBANG}}
+	echo "initializing dvc into {{DVC_REMOTE}}"
+	uv run dvc remote add -d azure --local {{DVC_REMOTE}}
+	$SECRETS_TOML = uv run dynaconf -i {{PROJECT_NAME}}.config_inputs.config.conf get AZURE_SECRET -d 'key_not_found'
+	if ('{{AZURE_SECRET}}' -ne 'key_not_found') {
+		uv run dvc remote modify azure --local connection_string '{{AZURE_SECRET}}'
+		echo 'remote added with AZURE_SECRET from environment'
+	} 
+	elseif ($SECRETS_TOML -ne 'key_not_found') {
+		uv run dvc remote modify azure --local connection_string $SECRETS_TOML
+		echo 'remote added with AZURE_SECRET from .secrets.toml file'
+	} 
+	else {
+		echo 'Error: need AZURE_SECRET in environment variable or .secrets.toml file'
+		uv run dvc remote remove --local azure
+	}
+
+
+
+
+# Other - adhoc useful commands
+# ------------------------------------------
+
+# clean. dash in front of command to ignore errors
+clean:
+	#!{{POWERSHELL_SHEBANG}}
+	Remove-Item -Path "_freeze" -Recurse -Confirm -Erroraction 'silentlycontinue'
+	Remove-Item -Path ".pytest_cache" -Recurse -Confirm -Erroraction 'silentlycontinue'
+	Remove-Item -Path ".ruff_cache" -Recurse -Confirm -Erroraction 'silentlycontinue' 
+	Remove-Item -Path "__pycache__" -Recurse -Confirm -Erroraction 'silentlycontinue'
+	Remove-Item -Path ".quarto" -Recurse -Confirm -Erroraction 'silentlycontinue'
+	Get-ChildItem -Path . -Filter "__pycache__" -Recurse -Directory | Remove-Item -Recurse -Force
+
+# dvc pull
+dvc-pull:
+	uv run dvc-pull
+
+# dvc add using import-url so that we have metadata on original source going to data/01_raw folder. Usage: just dvc-add NEWFILE='remote.source.link'
+dvc-add NEWFILE:
+	uv run dvc import-url {{NEWFILE}} data/01_raw 
+
+# release version with tag (only for maintainers with merge permissions). Usage: just cd-release 'yyyy.mm.dd'
+cd-release VERSION:
+	git checkout -b release-{{VERSION}} develop
+	uv run python project_management.py bump-version {{VERSION}}
+	git commit -a -m "chore: Bumped version number to {{VERSION}}"
+	git checkout main
+	git merge --no-ff release-{{VERSION}}
+	git tag -a {{VERSION}} -m "add version tag"
+	git push origin {{VERSION}}
+	git push
+	git checkout develop
+	git merge --no-ff main
+	git branch -d release-{{VERSION}}
+	git push
+
+# install python version (with uv, rye and point to the right venv for uv to use)
+python-install:
+	#!{{POWERSHELL_SHEBANG}}
+	powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+	winget install Rye.Rye
+	rye fetch {{PYTHONVERSION}}
+	uv venv -p $home\.rye\py\cpython@{{PYTHONVERSION}}\python.exe
+
+
