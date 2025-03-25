@@ -32,4 +32,4 @@ Quarto for documentation (over sphinx) because easy-to-use and great documentati
 ## Installation
 Run this:
 
-`uvx copier copy --trust git@github.com:actuaristai/copier_template.git path/to/newfolder`
+`uvx copier copy --trust git@github.com:actuaristai/template.git path/to/newfolder`

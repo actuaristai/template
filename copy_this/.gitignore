@@ -90,3 +90,6 @@ test_db.db
 terraform/terraform.tfstate
 terraform/.terraform/
 terraform/terraform.tfstate.backup
+
+.dvc/cache/
+.dvc/tmp/
