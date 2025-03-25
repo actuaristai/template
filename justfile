@@ -156,12 +156,3 @@ cd-release VERSION:
 	git branch -d release-{{VERSION}}
 	git push
 
-# install python version (with uv, rye and point to the right venv for uv to use)
-python-install:
-	#!{{POWERSHELL_SHEBANG}}
-	powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
-	winget install Rye.Rye
-	rye fetch {{PYTHONVERSION}}
-	uv venv -p $home\.rye\py\cpython@{{PYTHONVERSION}}\python.exe
-
-
