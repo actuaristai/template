@@ -102,7 +102,7 @@ init-env:
 # pre-commit
 init-pre-commit:
 	uvx pre-commit install --hook-type pre-commit --hook-type commit-msg
-    uvx pre-commit autoupdate
+	uvx pre-commit autoupdate
 	uvx pre-commit run --all-files
 
 # set up dvc
@@ -112,23 +112,11 @@ init-dvc:
 
 
 # set up dvc remote. ensure AZURE_SECRET is in environment or in .secrets.toml file
-init-dvc-remote:
+init-dvc-remote DVC_REMOTE_NAME DVC_REMOTE DVC_SECRET:
 	#!{{POWERSHELL_SHEBANG}}
 	echo "initializing dvc into {{DVC_REMOTE}}"
-	uv run dvc remote add -d azure --local {{DVC_REMOTE}}
-	$SECRETS_TOML = uv run dynaconf -i {{PROJECT_NAME}}.config_inputs.config.conf get AZURE_SECRET -d 'key_not_found'
-	if ('{{AZURE_SECRET}}' -ne 'key_not_found') {
-		uv run dvc remote modify azure --local connection_string '{{AZURE_SECRET}}'
-		echo 'remote added with AZURE_SECRET from environment'
-	} 
-	elseif ($SECRETS_TOML -ne 'key_not_found') {
-		uv run dvc remote modify azure --local connection_string $SECRETS_TOML
-		echo 'remote added with AZURE_SECRET from .secrets.toml file'
-	} 
-	else {
-		echo 'Error: need AZURE_SECRET in environment variable or .secrets.toml file'
-		uv run dvc remote remove --local azure
-	}
+	uv run dvc remote add -d {{DVC_REMOTE_NAME}} --local {{DVC_REMOTE}}
+	uv run dvc remote modify {{DVC_REMOTE_NAME}} --local connection_string '{{DVC_SECRET}}'
 
 
 
