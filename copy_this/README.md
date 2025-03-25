@@ -24,10 +24,9 @@ Quarto for documentation (over sphinx) because easy-to-use and great documentati
 
 # Quick start installation
 ## Pre-requisites
-
-- just: https://just.systems/man/en/
-- uv: https://docs.astral.sh/uv/
-- quarto: https://quarto.org/
+just: https://just.systems/man/en/
+uv: https://docs.astral.sh/uv/
+quarto: https://quarto.org/
 
 ## Installation
 Run this:

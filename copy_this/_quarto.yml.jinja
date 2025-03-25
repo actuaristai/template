@@ -1,0 +1,34 @@
+project:
+  type: website
+  output-dir: ./_site
+  execute-dir: project
+
+# tell quarto to read the generated sidebar
+metadata-files:
+  - docs/_sidebar.yml
+
+
+quartodoc:
+  # the name used to import the package you want to create reference docs for
+  package: {{project_name}}
+
+  # write sidebar data to this file
+  sidebar: docs/_sidebar.yml
+
+  sections:
+    - title: API reference
+      desc: Functions to inspect docstrings.
+      contents:
+        # the functions being documented in the package.
+        # you can refer to anything: class methods, modules, etc..
+        - hello
+
+website:
+  navbar:
+    background: primary
+    search: true
+    title: Docs
+    left:
+      - text: "Reference API"
+        file: reference/index.qmd
+
