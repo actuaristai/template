@@ -5,7 +5,6 @@ set shell:= ["pwsh.exe", "-c"]
 
 PROJECT_NAME:= "template"
 REMOTE_REPO := "git@github.com:actuaristai/template.git"
-PYTHONVERSION := "3.11.5"
 
 
 POWERSHELL_SHEBANG := if os() == 'windows' {
@@ -156,13 +155,4 @@ cd-release VERSION:
 	git merge --no-ff main
 	git branch -d release-{{VERSION}}
 	git push
-
-# install python version (with uv, rye and point to the right venv for uv to use)
-python-install:
-	#!{{POWERSHELL_SHEBANG}}
-	powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
-	winget install Rye.Rye
-	rye fetch {{PYTHONVERSION}}
-	uv venv -p $home\.rye\py\cpython@{{PYTHONVERSION}}\python.exe
-
 
