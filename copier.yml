@@ -1,0 +1,36 @@
+_subdirectory: copy_this
+
+_message_before_copy:
+    "=================================================================================== \n
+    Welcome to the Actuarist AI project template for Data Science\n"
+
+_exclude:
+    copier.yaml
+
+_tasks:
+    # Strings get executed under system's default shell
+    - "powershell Move-Item secrets.toml .secrets.toml"
+    - >-
+      just _init-all
+
+_skip_if_exists:
+    secrets.toml
+
+# questions
+full_name:
+    type: str
+    default: "{{ 'Author Name' }}"
+    help: Please enter your full name
+email:
+    type: str
+    default: "{{ 'name@domain.com' }}"
+project_name:
+    type: str
+    placeholder: my_project
+    validator: "{% if project_name == '' %}please enter a value (no spaces){% endif %}"
+project_short_description:
+    type: str
+    default: Please describe the purpose of your project
+remote_repository:
+    type: str
+    default: git@github.com:actuaristai/{{project_name}}.git
