@@ -53,22 +53,10 @@ test:
 run:
 	uv run dvc repro
 
-# update template using copier. 
+# update template using copier. optional: use other copier options like vcs-ref=branch 
 update-template *COPIER_OPTIONS:
-	#!{{POWERSHELL_SHEBANG}}
-	if(git status --porcelain |Where {$_ -match '^\?\?'}){
-		# untracked files exist: Untracked files are prefixed with the status ??, so you can easily filter those out
-		# and then check if there are uncommitted changes based on whether there is any output left:
-		echo 'Error: untracked files exist. Please commit or remove them before updating template'
-	} 
-	elseif(git status --porcelain |Where {$_ -notmatch '^\?\?'}) {
-		# uncommitted changes
-		echo 'Error: uncommitted changes exist. Please commit or remove them before updating template'
-	}
-	else {
-		# tree is clean
-		uvx copier copy git@github.com:actuaristai/template.git . --trust --data 'auto_run_setup=no'
-	}
+	uvx copier update --trust --skip-tasks --skip-answered
+
 
 # Initialisations - only need to be run once
 # ------------------------------------------
