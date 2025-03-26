@@ -33,7 +33,7 @@ help:
 
 # build api documentation using quarto and render
 _docs-build:
-	# uv run quartodoc build
+	uv run quartodoc build
 	uv run quarto render
 
 # build docs and preview using quarto
