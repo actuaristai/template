@@ -60,6 +60,8 @@ jobs:
   generate_docs:
     runs-on: ubuntu-latest
     needs: test
+    permissions:
+      contents: write  # Grants write access to the repository contents
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
