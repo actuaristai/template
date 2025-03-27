@@ -147,9 +147,9 @@ cd-release VERSION:
 # publish to github pages
 cd-publish:
 	# bug workaround to uninstall pre-commit before publishing
-	uvx run pre-commit uninstall -t pre-commit -t pre-merge-commit -t pre-push -t prepare-commit-msg -t commit-msg -t post-commit -t post-checkout -t post-merge -t post-rewrite
+	uvx pre-commit uninstall -t pre-commit -t commit-msg
 	uv run quarto publish gh-pages
-	uvx run pre-commit install
+	uvx pre-commit install
 
 # Initialise blank gh-pages branch for publishing
 init-gh-pages:
