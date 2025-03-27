@@ -146,9 +146,10 @@ cd-release VERSION:
 
 # publish to github pages
 cd-publish:
-	uvx pre-commit uninstall # bug workaround to uninstall pre-commit before publishing
-	quarto publish gh-pages
-	uvx pre-commit install # install it again after publishing
+	# bug workaround to uninstall pre-commit before publishing
+	uvx run pre-commit uninstall -t pre-commit -t pre-merge-commit -t pre-push -t prepare-commit-msg -t commit-msg -t post-commit -t post-checkout -t post-merge -t post-rewrite
+	uv run quarto publish gh-pages
+	uvx run pre-commit install
 
 # Initialise blank gh-pages branch for publishing
 init-gh-pages:
@@ -156,6 +157,10 @@ init-gh-pages:
 	git reset --hard # make sure all changes are committed before running this!
 	git commit --allow-empty -m "feat: Initialising gh-pages branch"  --no-verify
 	git push origin gh-pages
-	echo 'After this, please modify settings: Pages to source github pages from gh-pages branch and root'
+	echo 'After this, please check settings: Pages to source github pages from gh-pages branch and root'
+	# manual trouble-shooting: 
+	# git worktree list
+	# git worktree prune
+	# git worktree remove ... --force
 
 {% endraw %}

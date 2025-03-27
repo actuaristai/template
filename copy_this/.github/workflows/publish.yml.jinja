@@ -82,12 +82,17 @@ jobs:
           uv run python -m ipykernel install --user --name {{project_name}}
           uv run quarto render
 
-      - name: Publish 
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          uv run quarto publish gh-pages
-        env: 
-          GITHUB_TOKEN: {% raw %}${{ secrets.GITHUB_TOKEN }}{% endraw %}
-          # check Read and write permissions box under Workflow permissions in the Actions section of your repository Settings.
+      # to set up publish need to manually run:
+      # just init-gh-pages
+      # and check Read and write permissions box under Workflow permissions in the Actions section of your repository Settings
+      # then can uncomment the below
+
+      #- name: Publish 
+      #  run: |
+      #    git config user.name "github-actions[bot]"
+      #    git config user.email "github-actions[bot]@users.noreply.github.com"
+      #    uv run quarto publish gh-pages
+      #  env: 
+      #    GITHUB_TOKEN: {% raw %}${{ secrets.GITHUB_TOKEN }}{% endraw %}
+      #    # check Read and write permissions box under Workflow permissions in the Actions section of your repository Settings.
 
