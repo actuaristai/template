@@ -144,3 +144,15 @@ cd-release VERSION:
 	git branch -d release-{{VERSION}}
 	git push
 
+# publish to github pages
+cd-publish:
+	uvx pre-commit uninstall # bug workaround to uninstall pre-commit before publishing
+	quarto publish gh-pages
+	uvx pre-commit install # install it again after publishing
+
+# Initialise blank gh-pages branch for publishing
+init-gh-pages:
+	git checkout --orphan gh-pages
+	git reset --hard # make sure all changes are committed before running this!
+	git commit --allow-empty -m "feat: Initialising gh-pages branch"
+	git push origin gh-pages
