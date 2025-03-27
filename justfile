@@ -149,7 +149,7 @@ cd-publish:
 	# bug workaround to uninstall pre-commit before publishing
 	uvx pre-commit uninstall -t pre-commit -t commit-msg
 	uv run quarto publish gh-pages
-	uvx pre-commit install
+	uvx pre-commit install --hook-type pre-commit --hook-type commit-msg
 
 # Initialise blank gh-pages branch for publishing
 init-gh-pages:
