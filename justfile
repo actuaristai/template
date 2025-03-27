@@ -154,5 +154,5 @@ cd-publish:
 init-gh-pages:
 	git checkout --orphan gh-pages
 	git reset --hard # make sure all changes are committed before running this!
-	git commit --allow-empty -m "feat: Initialising gh-pages branch"
+	git commit --allow-empty -m "feat: Initialising gh-pages branch" --no-verify
 	git push origin gh-pages
