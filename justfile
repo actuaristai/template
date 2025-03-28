@@ -62,7 +62,7 @@ update-template *COPIER_OPTIONS:
 # ------------------------------------------
 
 # set up all to start up a project
-_init-all: init-git init-project lint test _docs-build init-git-push
+_init-all: init-git init-project lint test _docs-build init-git-push init-publish
 
 # set up project (after cloning existing repository)
 init-project: init-env init-pre-commit init-dvc
@@ -151,7 +151,6 @@ init-publish: init-gh-pages
 	uvx pre-commit uninstall -t pre-commit -t commit-msg
 	uv run quarto publish gh-pages
 	uvx pre-commit install --hook-type pre-commit --hook-type commit-msg
-	git checkout develop
 
 # Initialise blank gh-pages branch for publishing
 init-gh-pages:
@@ -159,8 +158,4 @@ init-gh-pages:
 	git reset --hard # make sure all changes are committed before running this!
 	git commit --allow-empty -m "feat: Initialising gh-pages branch"  --no-verify
 	git push origin gh-pages
-	echo 'After this, please check settings: Pages to source github pages from gh-pages branch and root'
-	# manual trouble-shooting: 
-	# git worktree list
-	# git worktree prune
-	# git worktree remove ... --force
+	git checkout develop
