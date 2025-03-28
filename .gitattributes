@@ -24,3 +24,7 @@
 # Makefile and build scripts
 Makefile text eol=lf
 *.mk text eol=lf
+
+# DVC specific files
+.dvc/.gitignore text eol=lf
+.dvc/** text eol=lf

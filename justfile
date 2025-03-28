@@ -153,7 +153,7 @@ init-publish: init-gh-pages
 # Initialise blank gh-pages branch for publishing
 init-gh-pages:
 	git checkout --orphan gh-pages
-	echo n | git reset --hard # make sure all changes are committed before running this! # no as it asks do delete erroneous docs directory
+	git reset --hard # make sure all changes are committed before running this! # no as it asks do delete erroneous docs directory
 	git commit --allow-empty -m "feat: Initialising gh-pages branch"  --no-verify
 	git push origin gh-pages
 	git checkout develop
