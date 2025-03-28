@@ -1,0 +1,26 @@
+# Auto detect text files and perform LF normalization
+* text=auto eol=lf
+
+# Explicitly specify line endings for specific file types
+*.{py,yml,yaml,json,md,qmd,txt,sh,rst} text eol=lf
+*.{bat,cmd} text eol=crlf
+
+# Prevent binary files from being modified
+*.{png,jpg,jpeg,gif,ico,svg,pdf} -text
+*.{zip,tar,gz,7z} -text
+
+# Quarto and Jupyter specific files
+*.ipynb text eol=lf
+*.qmd text eol=lf
+
+# Configuration files
+.gitattributes text eol=lf
+.gitignore text eol=lf
+
+# Script files
+*.sh text eol=lf
+*.ps1 text eol=lf
+
+# Makefile and build scripts
+Makefile text eol=lf
+*.mk text eol=lf

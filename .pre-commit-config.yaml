@@ -1,19 +1,29 @@
 repos:
-  - repo: https://github.com/pre-commit/mirrors-autopep8
-    rev: v2.0.4  # Use the sha / tag you want to point at
+  - repo: local
     hooks:
-    -   id: autopep8
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.11.2
-    hooks:
-      - id: ruff
-        args: [ --fix, --exit-non-zero-on-fix ]
-        stages: [pre-commit]
-
-
-  # Lint commit message following conventional-commit convention
-  - repo: https://github.com/commitizen-tools/commitizen
-    rev: v4.4.1
-    hooks:
-      - id: commitizen
+      - id: commitizen-local
+        name: commitizen-local
+        entry: uv run cz check
+        args: [--commit-msg-file]
+        language: python
         stages: [commit-msg]
+  - repo: local
+    hooks:
+      - id: autopep8-local
+        name: autopep8-local
+        entry: uv run autopep8
+        language: python
+        args: [--in-place, --aggressive]
+        types: [python]
+        pass_filenames: true
+  - repo: local
+    hooks:
+      - id: ruff-local
+        name: ruff-local
+        entry: uv run ruff check
+        language: python
+        args: [ --fix, --exit-non-zero-on-fix ]
+        types: [python]
+        stages: [pre-commit]
+        pass_filenames: true
+        exclude: "__init__.py"
