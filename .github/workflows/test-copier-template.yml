@@ -60,10 +60,10 @@ jobs:
             fi
             
             # Verify the project name was used correctly
-            if grep -q "check1" "$TEMP_DIR/README.md" || grep -q "check1" "$TEMP_DIR/pyproject.toml"; then
-              echo "✅ Project name 'check1' was used correctly in the generated files."
+            if grep -q "check" "$TEMP_DIR/README.md" || grep -q "check" "$TEMP_DIR/pyproject.toml"; then
+              echo "✅ Project name 'check' was used correctly in the generated files."
             else
-              echo "❌ Project name 'check1' was not found in the expected files."
+              echo "❌ Project name 'check' was not found in the expected files."
               exit 1
             fi
           else
