@@ -92,7 +92,7 @@ jobs:
           fi
 
       - name: Publish (Run only if gh-pages exists)
-        if: env.exists == 'true'
+        if: env.exists == 'true' && github.ref_name != 'gh-pages'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
