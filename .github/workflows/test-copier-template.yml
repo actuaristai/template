@@ -30,15 +30,10 @@ jobs:
         run: |
           # Create a temporary directory for testing
           TEMP_DIR=$(mktemp -d)
-          
-          # Create an answers file with project_name set
-          cat > answers.yml << EOL
-          project_name: "check1"
-          EOL
-          
+                    
           # Try to copy the template to the temp directory
           echo "Testing copier copy operation..."
-          uvx copier copy --trust --answers-file answers.yml . $TEMP_DIR --vcs-ref=$GITHUB_SHA
+          uvx copier copy --trust git@github.com:actuaristai/template.git path/to/newfolder $TEMP_DIR --vcs-ref=$GITHUB_SHA --data "project_name=check" --data "full_name=Test" --data "email=test" --data "project_short_description=lala" --data "remote_repository=git" 
           
           # Check if copying was successful
           if [ $? -eq 0 ]; then
