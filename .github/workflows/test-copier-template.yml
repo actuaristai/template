@@ -31,6 +31,13 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           
+      - name: Clone Another Repository
+        run: |
+          git clone git@github.com:actuaristai/template.git
+        env:
+          GIT_ASKPASS: echo
+          GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Test template copying
         run: |
           # Create a temporary directory for testing
