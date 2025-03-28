@@ -1,0 +1,70 @@
+name: Test Copier Template
+
+on:
+  push:
+    branches: [ '*' ]
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  test-copier-template:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+          
+      - name: Install dependencies
+        run: |
+          uv pip install copier pytest
+          
+      - name: Test template copying
+        run: |
+          # Create a temporary directory for testing
+          TEMP_DIR=$(mktemp -d)
+          
+          # Create an answers file with project_name set
+          cat > answers.yml << EOL
+          project_name: "check1"
+          EOL
+          
+          # Try to copy the template to the temp directory
+          echo "Testing copier copy operation..."
+          uvx copier copy --answers-file answers.yml . $TEMP_DIR --vcs-ref=$GITHUB_SHA
+          
+          # Check if copying was successful
+          if [ $? -eq 0 ]; then
+            echo "✅ Template copied successfully!"
+            
+            # Validate the generated project
+            echo "Validating generated project structure..."
+            if [ -f "$TEMP_DIR/README.md" ]; then
+              echo "✅ Basic project structure appears valid."
+            else
+              echo "❌ Generated project doesn't have expected files."
+              exit 1
+            fi
+            
+            # Verify the project name was used correctly
+            if grep -q "check1" "$TEMP_DIR/README.md" || grep -q "check1" "$TEMP_DIR/pyproject.toml"; then
+              echo "✅ Project name 'check1' was used correctly in the generated files."
+            else
+              echo "❌ Project name 'check1' was not found in the expected files."
+              exit 1
+            fi
+          else
+            echo "❌ Copier template failed!"
+            exit 1
+          fi
