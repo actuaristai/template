@@ -40,9 +40,6 @@ jobs:
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
 
-      - name: Install GitHub CLI
-        uses: actions/setup-github-cli@v1
-
       - name: Test template copying
         run: |
           # Create a temporary directory for testing
