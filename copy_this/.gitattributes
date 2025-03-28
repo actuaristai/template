@@ -1,0 +1,2 @@
+# Set Git to automatically convert line endings
+git config --global core.autocrlf true  # For Windows
