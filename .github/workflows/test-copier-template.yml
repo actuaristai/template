@@ -31,12 +31,11 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           
-      - name: Clone Another Repository
+      - name: Install PowerShell
         run: |
-          git clone https://github.com/actuaristai/template.git
-        env:
-          GIT_ASKPASS: echo
-          GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          sudo apt update
+          sudo apt install -y powershell
+        shell: bash
 
       - name: Test template copying
         run: |
