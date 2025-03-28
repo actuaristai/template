@@ -26,10 +26,6 @@ jobs:
           curl -LsSf https://astral.sh/uv/install.sh | sh
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH
           
-      - name: Install dependencies
-        run: |
-          uv pip install copier pytest
-          
       - name: Test template copying
         run: |
           # Create a temporary directory for testing
