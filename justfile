@@ -146,7 +146,7 @@ cd-release VERSION:
 	git push
 
 # publish to github pages
-init-publish: init-gh-pages
+cd-publish
 	# bug workaround to uninstall pre-commit before publishing
 	$env:PRE_COMMIT_ALLOW_NO_CONFIG = "1"; uv run quarto publish gh-pages
 
