@@ -63,7 +63,7 @@ update-template *COPIER_OPTIONS:
 # ------------------------------------------
 
 # set up all to start up a project
-_init-all: init-git init-project lint test _docs-build init-git-push init-publish
+_init-all: init-git init-project lint test _docs-build init-git-push init-gh-pages
 
 # set up project (after cloning existing repository)
 init-project: init-env init-pre-commit init-dvc
@@ -145,7 +145,7 @@ cd-release VERSION:
 	git push
 
 # publish to github pages
-init-publish: init-gh-pages
+cd-publish:
 	# bug workaround for lack of pre-commit in gh-pages branch
 	$env:PRE_COMMIT_ALLOW_NO_CONFIG = "1"; uv run quarto publish gh-pages
 
