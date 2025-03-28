@@ -32,7 +32,6 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
-    needs: static_analysis
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -59,7 +58,6 @@ jobs:
 
   generate_docs:
     runs-on: ubuntu-latest
-    needs: test
     permissions:
       contents: write  # Grants write access to the repository contents
     steps:
@@ -84,19 +82,21 @@ jobs:
           uv run python -m ipykernel install --user --name {{project_name}}
           uv run quarto render
 
-      # to set up publish need to manually run:
-      # just init-gh-pages
-      # and check Read and write permissions box under Workflow permissions in the Actions section of your repository Settings
-      # git checkout develop
-      # just cd-publish
-      # then can uncomment the below
+      - name: Check if gh-pages exists
+        id: check
+        run: |
+          if git ls-remote --heads origin gh-pages | grep -q gh-pages; then
+            echo "exists=true" >> $GITHUB_ENV
+          else
+            echo "exists=false" >> $GITHUB_ENV
+          fi
 
-      #- name: Publish 
-      #  run: |
-      #    git config user.name "github-actions[bot]"
-      #    git config user.email "github-actions[bot]@users.noreply.github.com"
-      #    uv run quarto publish gh-pages
-      #  env: 
-      #    GITHUB_TOKEN: {% raw %}${{ secrets.GITHUB_TOKEN }}{% endraw %}
-      #    # check Read and write permissions box under Workflow permissions in the Actions section of your repository Settings.
-
+      - name: Publish (Run only if gh-pages exists)
+        if: env.exists == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          uv run quarto publish gh-pages
+        env: 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # check Read and write permissions box under Workflow permissions in the Actions section of your repository Settings.

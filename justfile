@@ -77,6 +77,7 @@ init-git:
 init-git-push:
 	git add .
 	git commit -m 'feat: add dvc and qmd initialisations'
+	just init-
 	git push -u origin develop
 	git checkout -b main
 	git push -u origin main
@@ -145,11 +146,12 @@ cd-release VERSION:
 	git push
 
 # publish to github pages
-cd-publish:
+init-publish: init-gh-pages
 	# bug workaround to uninstall pre-commit before publishing
 	uvx pre-commit uninstall -t pre-commit -t commit-msg
 	uv run quarto publish gh-pages
 	uvx pre-commit install --hook-type pre-commit --hook-type commit-msg
+	git checkout develop
 
 # Initialise blank gh-pages branch for publishing
 init-gh-pages:
