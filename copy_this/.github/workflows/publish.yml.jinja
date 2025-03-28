@@ -97,6 +97,8 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           uv run quarto publish gh-pages
-        env: 
+        env:
+          {% raw %}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # check Read and write permissions box under Workflow permissions in the Actions section of your repository Settings.
+          {% endraw %}
+  
