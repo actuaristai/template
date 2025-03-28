@@ -38,7 +38,7 @@ jobs:
           
           # Try to copy the template to the temp directory
           echo "Testing copier copy operation..."
-          uvx copier copy --answers-file answers.yml . $TEMP_DIR --vcs-ref=$GITHUB_SHA
+          uvx copier copy --trust --answers-file answers.yml . $TEMP_DIR --vcs-ref=$GITHUB_SHA
           
           # Check if copying was successful
           if [ $? -eq 0 ]; then
