@@ -61,6 +61,15 @@ jobs:
     permissions:
       contents: write  # Grants write access to the repository contents
     steps:
+      - name: Check if gh-pages exists
+        id: check
+        run: |
+          if git ls-remote --heads origin gh-pages | grep -q gh-pages; then
+            echo "exists=true" >> $GITHUB_ENV
+          else
+            echo "exists=false" >> $GITHUB_ENV
+          fi
+
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -81,15 +90,6 @@ jobs:
         run: |
           uv run python -m ipykernel install --user --name {{project_name}}
           uv run quarto render
-
-      - name: Check if gh-pages exists
-        id: check
-        run: |
-          if git ls-remote --heads origin gh-pages | grep -q gh-pages; then
-            echo "exists=true" >> $GITHUB_ENV
-          else
-            echo "exists=false" >> $GITHUB_ENV
-          fi
 
       - name: Publish (Run only if gh-pages exists)
         if: env.exists == 'true' && github.ref_name != 'gh-pages'
