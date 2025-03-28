@@ -45,7 +45,7 @@ jobs:
                     
           # Try to copy the template to the temp directory
           echo "Testing copier copy operation..."
-          uvx copier copy --trust https://github.com/actuaristai/template.git $TEMP_DIR --vcs-ref=$GITHUB_SHA --data "project_name=check" --data "full_name=Test" --data "email=test" --data "project_short_description=lala" --data "remote_repository=git" 
+          uvx copier copy --trust https://github.com/actuaristai/template.git $TEMP_DIR --vcs-ref=$GITHUB_SHA --data "project_name=check" --data "full_name=Test" --data "email=test@email.com" --data "project_short_description=lala" --data "remote_repository=git" 
           
           # Check if copying was successful
           if [ $? -eq 0 ]; then
