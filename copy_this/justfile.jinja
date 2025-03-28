@@ -1,14 +1,14 @@
 # to install just: run this in powershell:
 # winget install --id Casey.Just --exact
 
-set shell:= ["pwsh.exe", "-c"]
+set shell:= ["pwsh", "-c"]
 
 PROJECT_NAME:= "{{project_name}}"
 REMOTE_REPO := "{{remote_repository}}"{% raw %}
 
 
 POWERSHELL_SHEBANG := if os() == 'windows' {
-  'powershell.exe'
+  'pwsh.exe'
 } else {
   '/usr/bin/env pwsh'
 }

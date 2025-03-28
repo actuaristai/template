@@ -1,14 +1,14 @@
 # to install just: run this in powershell:
 # winget install --id Casey.Just --exact
 
-set shell:= ["pwsh.exe", "-c"]
+set shell:= ["pwsh", "-c"]
 
 PROJECT_NAME:= "template"
 REMOTE_REPO := "git@github.com:actuaristai/template.git"
 
 
 POWERSHELL_SHEBANG := if os() == 'windows' {
-  'powershell.exe'
+  'pwsh.exe'
 } else {
   '/usr/bin/env pwsh'
 }
