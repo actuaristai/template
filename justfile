@@ -62,7 +62,7 @@ update-template *COPIER_OPTIONS:
 # ------------------------------------------
 
 # set up all to start up a project
-_init-all: init-git init-project lint test _docs-build init-git-push
+_init-all: init-git init-project lint test _docs-build init-git-push init-gh-pages cd-publish
 
 # set up project (after cloning existing repository)
 init-project: init-env init-pre-commit init-dvc
@@ -77,6 +77,7 @@ init-git:
 init-git-push:
 	git add .
 	git commit -m 'feat: add dvc and qmd initialisations'
+	just init-
 	git push -u origin develop
 	git checkout -b main
 	git push -u origin main
@@ -144,3 +145,15 @@ cd-release VERSION:
 	git branch -d release-{{VERSION}}
 	git push
 
+# publish to github pages
+cd-publish:
+	# bug workaround to uninstall pre-commit before publishing
+	$env:PRE_COMMIT_ALLOW_NO_CONFIG = "1"; uv run quarto publish gh-pages
+
+# Initialise blank gh-pages branch for publishing
+init-gh-pages:
+	git checkout --orphan gh-pages
+	echo n | git reset --hard # make sure all changes are committed before running this! # no as it asks do delete erroneous docs directory
+	git commit --allow-empty -m "feat: Initialising gh-pages branch"  --no-verify
+	git push origin gh-pages
+	git checkout develop

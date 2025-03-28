@@ -1,10 +1,10 @@
 [project]
 name = "template"
-version = "1.1"
+version = "1.2"
 description = "Copier template for best practices and preferred tools"
 readme = "README.md"
 requires-python = ">=3.13"
-dependencies = [ "dynaconf>=3.2.10", "ipykernel>=6.29.5", "loguru>=0.7.3", "pytest>=8.3.5", "pytest-cov>=6.0.0", "ruff>=0.11.2", "nbclient>=0.10.2", "nbformat>=5.10.4", "quartodoc>=0.9.1", "toml>=0.10.2", "typer>=0.15.2",]
+dependencies = [ "dynaconf>=3.2.10", "ipykernel>=6.29.5", "loguru>=0.7.3", "pytest>=8.3.5", "pytest-cov>=6.0.0", "ruff>=0.11.2", "nbclient>=0.10.2", "nbformat>=5.10.4", "quartodoc>=0.9.1", "toml>=0.10.2", "typer>=0.15.2", "autopep8>=2.3.2", "commitizen>=4.4.1",]
 
 [tool.ruff]
 src = [ "template", "tests",]

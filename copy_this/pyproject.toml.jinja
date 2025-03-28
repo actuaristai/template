@@ -20,6 +20,8 @@ dependencies = [
     "quartodoc>=0.9.1",
     "toml>=0.10.2",
     "typer>=0.15.2",
+    "autopep8>=2.3.2",
+    "commitizen>=4.4.1",
 ]
 
 [[project.authors]]
@@ -27,7 +29,7 @@ name = "{{full_name}}"
 email = "{{email}}"
 
 [tool.ruff]
-src = [ "{{project_name}}", "tests",]
+src = [ "src/{{project_name}}", "tests", "conf",]
 line-length = 120
 exclude = [ ".git", ".ruff_cache", ".venv", "__pypackages__", "__init__.py",]
 
