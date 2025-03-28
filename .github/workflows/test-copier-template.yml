@@ -31,10 +31,11 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           
-      - name: Install PowerShell
+      - name: Install PowerShell and Just
         run: |
           sudo apt update
           sudo apt install -y powershell
+          sudo apt install just
         shell: bash
 
       - name: Test template copying
