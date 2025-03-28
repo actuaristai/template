@@ -11,7 +11,7 @@ _skip_if_exists: true
 
 _tasks:
     # Strings get executed under system's default shell
-    - "powershell Move-Item secrets.toml .secrets.toml"
+    - pwsh -Command "Move-Item -Path 'secrets.toml' -Destination '.secrets.toml' -Force"
     - >-
       just _init-all
 
