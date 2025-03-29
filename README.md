@@ -24,10 +24,11 @@ Quarto for documentation (over sphinx) because easy-to-use and great documentati
 
 # Quick start installation
 ## Pre-requisites
-
+- powershell: windows or linux
 - just: https://just.systems/man/en/
 - uv: https://docs.astral.sh/uv/
 - quarto: https://quarto.org/
+- github cli: to create remote repository automatically
 
 ## Installation
 Run this:
