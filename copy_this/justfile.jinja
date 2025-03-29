@@ -63,7 +63,7 @@ update-template *COPIER_OPTIONS:
 # ------------------------------------------
 
 # set up all to start up a project
-_init-all: init-git init-project lint test _docs-build init-git-push init-gh-pages cd-publish
+_init-all: init-git init-project lint test _docs-build
 
 # set up project (after cloning existing repository)
 init-project: init-env init-pre-commit init-dvc
@@ -79,9 +79,9 @@ init-git-push:
 	gh repo create {{PROJECT_NAME}} --public
 	git add .
 	git commit -m 'feat: add dvc and qmd initialisations'
-	pwsh -Command "git push -u origin develop -ErrorAction Continue"
+	git push -u origin develop
 	git checkout -b main
-	pwsh -Command "git push -u origin main -ErrorAction Continue"
+	git push -u origin main
 
 # set up environment using uv and set up ipykernel in project name
 init-env:
