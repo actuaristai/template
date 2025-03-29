@@ -79,9 +79,9 @@ init-git-push:
 	gh repo create {{PROJECT_NAME}} --public
 	git add .
 	git commit -m 'feat: add dvc and qmd initialisations'
-	pwsh -Command "git push -u origin develop; if ($?) { exit 0 }"
+	pwsh -Command "git push -u origin develop -ErrorAction Continue"
 	git checkout -b main
-	pwsh -Command "git push -u origin main; if ($?) { exit 0 }"
+	pwsh -Command "git push -u origin main -ErrorAction Continue"
 
 # set up environment using uv and set up ipykernel in project name
 init-env:
