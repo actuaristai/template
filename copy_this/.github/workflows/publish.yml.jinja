@@ -99,6 +99,6 @@ jobs:
           uv run quarto publish gh-pages
         env:
           {% raw %}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT }}
           {% endraw %}
   
