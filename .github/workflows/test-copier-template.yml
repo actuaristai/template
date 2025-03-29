@@ -46,8 +46,9 @@ jobs:
           TEMP_DIR=$(mktemp -d)
                     
           # Try to copy the template to the temp directory
+          git config --global credential.helper store
           echo "Testing copier copy operation..."
-          uvx copier copy --trust https://github.com/actuaristai/template.git $TEMP_DIR --vcs-ref=$GITHUB_SHA --data "project_name=check" --data "full_name=Test" --data "email=test@email.com" --data "project_short_description=lala" --data "remote_repository=https://x-access-token:${GITHUB_TOKEN}@github.com/actuaristai/check.git" 
+          uvx copier copy --trust https://github.com/actuaristai/template.git $TEMP_DIR --vcs-ref=$GITHUB_SHA --data "project_name=check" --data "full_name=Test" --data "email=test@email.com" --data "project_short_description=lala" --data "remote_repository=https://github.com/actuaristai/check.git" 
           
           # Check if copying was successful
           if [ $? -eq 0 ]; then
