@@ -40,6 +40,10 @@ jobs:
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
 
+      - name: Create check repository 
+        run: |
+          gh repo create check --public
+
       - name: Test template copying
         run: |
           # Create a temporary directory for testing
