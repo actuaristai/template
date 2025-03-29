@@ -40,12 +40,6 @@ jobs:
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
 
-      - name: Create check repository 
-        run: |
-          gh repo create check --public
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT }}
-
       - name: Test template copying
         run: |
           # Create a temporary directory for testing
@@ -53,7 +47,7 @@ jobs:
                     
           # Try to copy the template to the temp directory
           echo "Testing copier copy operation..."
-          uvx copier copy --trust https://github.com/actuaristai/template.git $TEMP_DIR --vcs-ref=$GITHUB_SHA --data "project_name=check" --data "full_name=Test" --data "email=test@email.com" --data "project_short_description=lala" --data "remote_repository=git" 
+          uvx copier copy --trust https://github.com/actuaristai/template.git $TEMP_DIR --vcs-ref=$GITHUB_SHA --data "project_name=check" --data "full_name=Test" --data "email=test@email.com" --data "project_short_description=lala" --data "remote_repository=https://github.com/actuaristai/check.git" 
           
           # Check if copying was successful
           if [ $? -eq 0 ]; then
@@ -81,3 +75,10 @@ jobs:
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.PAT }}
+
+      - name: Delete check repository 
+        run: |
+          gh repo delete check
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT }}
+
