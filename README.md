@@ -34,3 +34,6 @@ Quarto for documentation (over sphinx) because easy-to-use and great documentati
 Run this:
 
 `uvx copier copy --trust git@github.com:actuaristai/template.git path/to/newfolder`
+
+Optional flag
+`--vcs-ref=branch_name` to use a specific branch
