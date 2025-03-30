@@ -136,6 +136,7 @@ dvc-add NEWFILE:
 cd-release VERSION:
 	git checkout -b release-{{VERSION}} develop
 	uv run python bump_version.py {{VERSION}}
+	uv sync
 	git commit -a -m "chore: Bumped version number to {{VERSION}}" --no-verify
 	git checkout main
 	git merge --no-ff release-{{VERSION}}
