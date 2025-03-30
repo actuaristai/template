@@ -11,9 +11,12 @@ _skip_if_exists: true
 
 _tasks:
     # Strings get executed under system's default shell
-    - "powershell Move-Item secrets.toml .secrets.toml"
+    - pwsh -Command "Move-Item -Path 'secrets.toml' -Destination '.secrets.toml' -Force"
     - >-
       just _init-all
+    - "{{ 'just init-git-push' if project_name != 'check' else '' }}"
+    - "{{ 'just init-gh-pages' if project_name != 'check' else '' }}"
+    - "{{ 'just cd-publish' if project_name != 'check' else '' }}"
 
 _skip_if_exists:
     secrets.toml
