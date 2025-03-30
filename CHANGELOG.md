@@ -1,5 +1,11 @@
 ## Unreleased
 
+### Feat
+
+- add changelog for template project
+- include auto changelog in release version
+- add changelog
+
 ## 1.3.2 (2025-03-30)
 
 ### Fix
