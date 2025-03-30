@@ -62,7 +62,7 @@ update-template *COPIER_OPTIONS:
 # ------------------------------------------
 
 # set up all to start up a project
-_init-all: init-git init-project lint test _docs-build init-git-push init-gh-pages cd-publish
+_init-all: init-git init-project lint test _docs-build
 
 # set up project (after cloning existing repository)
 init-project: init-env init-pre-commit init-dvc
@@ -136,7 +136,7 @@ dvc-add NEWFILE:
 cd-release VERSION:
 	git checkout -b release-{{VERSION}} develop
 	uv run python bump_version.py {{VERSION}}
-	git commit -a -m "chore: Bumped version number to {{VERSION}}"
+	git commit -a -m "chore: Bumped version number to {{VERSION}}" --no-verify
 	git checkout main
 	git merge --no-ff release-{{VERSION}}
 	git tag -a {{VERSION}} -m "add version tag"
