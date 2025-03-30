@@ -62,7 +62,7 @@ update-template *COPIER_OPTIONS:
 # ------------------------------------------
 
 # set up all to start up a project
-_init-all: init-git init-project lint test _docs-build init-git-push init-gh-pages cd-publish
+_init-all: init-git init-project lint test _docs-build
 
 # set up project (after cloning existing repository)
 init-project: init-env init-pre-commit init-dvc
@@ -76,7 +76,7 @@ init-git:
 # create github repository and push initial git to remote
 init-git-push:
 	gh auth status
-	gh repo create {{project_name}} --public
+	gh repo create {{PROJECT_NAME}} --public
 	git add .
 	git commit -m 'feat: add dvc and qmd initialisations'
 	just init-
