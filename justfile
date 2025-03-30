@@ -76,7 +76,7 @@ init-git:
 # create github repository and push initial git to remote
 init-git-push:
 	gh auth status
-	gh repo create {{project_name}} --public
+	gh repo create {{PROJECT_NAME}} --public
 	git add .
 	git commit -m 'feat: add dvc and qmd initialisations'
 	just init-
