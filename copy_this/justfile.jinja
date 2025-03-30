@@ -1,14 +1,14 @@
 # to install just: run this in powershell:
 # winget install --id Casey.Just --exact
 
-set shell:= ["pwsh.exe", "-c"]
+set shell:= ["pwsh", "-c"]
 
 PROJECT_NAME:= "{{project_name}}"
 REMOTE_REPO := "{{remote_repository}}"{% raw %}
 
 
 POWERSHELL_SHEBANG := if os() == 'windows' {
-  'powershell.exe'
+  'pwsh.exe'
 } else {
   '/usr/bin/env pwsh'
 }
@@ -63,7 +63,7 @@ update-template *COPIER_OPTIONS:
 # ------------------------------------------
 
 # set up all to start up a project
-_init-all: init-git init-project lint test _docs-build init-git-push init-gh-pages cd-publish
+_init-all: init-git init-project lint test _docs-build
 
 # set up project (after cloning existing repository)
 init-project: init-env init-pre-commit init-dvc
@@ -74,8 +74,9 @@ init-git:
 	git add .
 	git commit -m 'feat: Initial commit'
 
-# push initial git to remote (developers can submit first push. develop should be default branch)
+# create github repository and push initial git to remote
 init-git-push:
+	gh repo create {{PROJECT_NAME}} --public
 	git add .
 	git commit -m 'feat: add dvc and qmd initialisations'
 	git push -u origin develop
