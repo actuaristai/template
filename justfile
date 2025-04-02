@@ -109,7 +109,42 @@ init-dvc-remote DVC_REMOTE_NAME DVC_REMOTE DVC_SECRET:
 	uv run dvc remote modify {{DVC_REMOTE_NAME}} --local connection_string '{{DVC_SECRET}}'
 
 
+# Initialise blank gh-pages branch for publishing
+init-gh-pages:
+	git checkout --orphan gh-pages
+	echo n | git reset --hard # make sure all changes are committed before running this! # no as it asks do delete erroneous docs directory
+	git commit --allow-empty -m "feat: Initialising gh-pages branch"  --no-verify
+	git push origin gh-pages
+	git checkout develop
 
+# Continuous deployment functions
+# ------------------------------------------
+
+# release version with tag (only for maintainers with merge permissions). Usage: just cd-release 'yyyy.mm.dd'
+cd-release VERSION:
+	git checkout -b release-{{VERSION}} develop
+	uv run python bump_version.py {{VERSION}}
+	uv sync
+	uv run cz changelog --incremental
+	git commit -a -m "chore: Bumped version number to {{VERSION}}" --no-verify
+	git checkout main
+	git merge --no-ff release-{{VERSION}}
+	git push
+	git tag -a {{VERSION}} -m "add version tag"
+	git push origin {{VERSION}}
+	git checkout develop
+	git merge --no-ff main
+	git branch -d release-{{VERSION}}
+	git push
+
+# publish to github pages
+cd-publish:
+	# bug workaround to uninstall pre-commit before publishing
+	$env:PRE_COMMIT_ALLOW_NO_CONFIG = "1"; uv run quarto publish gh-pages
+
+# build python package
+cd-build:
+	uvx --from build pyproject-build --installer uv
 
 # Other - adhoc useful commands
 # ------------------------------------------
@@ -132,32 +167,3 @@ dvc-pull:
 dvc-add NEWFILE:
 	uv run dvc import-url {{NEWFILE}} data/01_raw 
 
-# release version with tag (only for maintainers with merge permissions). Usage: just cd-release 'yyyy.mm.dd'
-cd-release VERSION:
-	git checkout -b release-{{VERSION}} develop
-	uv run python bump_version.py {{VERSION}}
-	uv sync
-	uv run cz changelog --incremental
-	git commit -a -m "chore: Bumped version number to {{VERSION}}" --no-verify
-	git checkout main
-	git merge --no-ff release-{{VERSION}}
-	git tag -a {{VERSION}} -m "add version tag"
-	git push origin {{VERSION}}
-	git push
-	git checkout develop
-	git merge --no-ff main
-	git branch -d release-{{VERSION}}
-	git push
-
-# publish to github pages
-cd-publish:
-	# bug workaround to uninstall pre-commit before publishing
-	$env:PRE_COMMIT_ALLOW_NO_CONFIG = "1"; uv run quarto publish gh-pages
-
-# Initialise blank gh-pages branch for publishing
-init-gh-pages:
-	git checkout --orphan gh-pages
-	echo n | git reset --hard # make sure all changes are committed before running this! # no as it asks do delete erroneous docs directory
-	git commit --allow-empty -m "feat: Initialising gh-pages branch"  --no-verify
-	git push origin gh-pages
-	git checkout develop
