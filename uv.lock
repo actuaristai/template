@@ -1934,7 +1934,7 @@ wheels = [
 
 [[package]]
 name = "template"
-version = "1.4"
+version = "1.4.1"
 source = { virtual = "." }
 dependencies = [
     { name = "autopep8" },
