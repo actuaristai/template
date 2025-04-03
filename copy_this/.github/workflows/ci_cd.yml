@@ -24,17 +24,20 @@ jobs:
           python-version: '3.13'
 
       - name: Install ruff
-        run: pip install ruff==0.11.2
+        run: |
+          pip install uv
+          sudo apt install just
+          uv sync --only-group lint
 
       - name: Lint code with ruff
-        run: ruff check {{project_name}}
+        run: just lint
         continue-on-error: true
 
   test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up Python 3.13
         uses: actions/setup-python@v5
@@ -44,10 +47,14 @@ jobs:
       - name: Install dependencies
         run: |
           pip install uv
-          uv sync
+          uv sync --only-group test
 
+      - name: Install Just
+        run: |
+          sudo apt install just
+      
       - name: Run tests with pytest
-        run: uv run pytest --cov-report term-missing --cov={{project_name}} -v -p no:faulthandler -W ignore::DeprecationWarning --verbose --doctest-modules --ignore copy_this
+        run: just test
         continue-on-error: true
 
       - name: Upload coverage results
@@ -61,20 +68,53 @@ jobs:
     permissions:
       contents: write  # Grants write access to the repository contents
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Check if gh-pages exists
         id: check
         run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
           if git ls-remote --heads origin gh-pages | grep -q gh-pages; then
             echo "exists=true" >> $GITHUB_ENV
           else
             echo "exists=false" >> $GITHUB_ENV
           fi
 
-      - name: Checkout code
-        uses: actions/checkout@v4
-
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install Just
+        run: |
+          sudo apt install just
+
+      - name: Install dependencies (uv and packages). Initialise environment
+        run: |
+          pip install uv
+          just init-env
+
+      - name: Build and render documentation with Quarto
+        run: |
+          uv run quarto render
+
+      - name: Publish (Run only if gh-pages exists)
+        if: env.exists == 'true' && github.ref_name != 'gh-pages'
+        run: |
+          uv run quarto publish gh-pages
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Set up Python 3.13
         uses: actions/setup-python@v5
@@ -85,20 +125,12 @@ jobs:
         run: |
           pip install uv
           uv sync
+      - name: Build package
+        run: uv build
 
-      - name: Build and render documentation with Quarto
-        run: |
-          uv run python -m ipykernel install --user --name {{project_name}}
-          uv run quarto render
-
-      - name: Publish (Run only if gh-pages exists)
-        if: env.exists == 'true' && github.ref_name != 'gh-pages'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          uv run quarto publish gh-pages
-        env:
-          {% raw %}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          {% endraw %}
-  
+      - name: Upload artifact
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-package
+          path: dist/

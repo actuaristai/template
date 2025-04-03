@@ -30,6 +30,14 @@ dependencies = [
 name = "{{full_name}}"
 email = "{{email}}"
 
+[dependency-groups]
+lint = [ "ruff",]
+test = [ "pytest", "pytest-cov", "dynaconf", "typer", "requests", "loguru", "toml",]
+dev = [ "ipykernel", "nbclient", "nbformat", "ruff", "autopep8", "commitizen", "dvc", "pytest", "pytest-cov", "quartodoc", "toml", "typer",]
+
+[tool.uv]
+default-groups = "all"
+
 [tool.ruff]
 src = [ "src/{{project_name}}", "tests", "conf",]
 line-length = 120

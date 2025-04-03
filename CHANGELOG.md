@@ -2,6 +2,18 @@
 
 ### Feat
 
+- homepage and url
+- dependency groups
+- build
+
+### Refactor
+
+- cleaner justfile
+
+## 1.4 (2025-03-31)
+
+### Feat
+
 - add changelog for template project
 - include auto changelog in release version
 - add changelog
