@@ -5,6 +5,7 @@ set shell:= ["pwsh", "-c"]
 
 PROJECT_NAME:= "template"
 REMOTE_REPO := "git@github.com:actuaristai/template.git"
+DESCRIPTION := "Purpose of this repository is to provide a template to use for new repositories using my preferred tooling and best practices."
 
 
 POWERSHELL_SHEBANG := if os() == 'windows' {
@@ -42,16 +43,18 @@ docs: _docs-build
 
 # Lint using ruff
 lint: 
-	uv run ruff check src/{{PROJECT_NAME}} --fix
-	uv run ruff check tests --fix
+	uv run --only-group lint ruff check src/{{PROJECT_NAME}} --fix
+	uv run --only-group lint ruff check tests --fix
 
 # test using pytest
 test:
-	uv run pytest --cov-report term-missing --cov={{PROJECT_NAME}} -v -p no:faulthandler -W ignore::DeprecationWarning --verbose --doctest-modules
+	uv run --only-group test pytest --cov-report term-missing --cov={{PROJECT_NAME}} -v -p no:faulthandler -W ignore::DeprecationWarning --verbose --doctest-modules
+	uv run --only-group test pytest --cov-report term-missing --cov=tests -v -p no:faulthandler -W ignore::DeprecationWarning --verbose --doctest-modules
 
 # reproduce dvc pipeline
 run:
 	uv run dvc repro
+	# uv run dvc push
 
 # update template using copier. optional: use other copier options like vcs-ref=branch 
 update-template *COPIER_OPTIONS:
@@ -75,11 +78,9 @@ init-git:
 
 # create github repository and push initial git to remote
 init-git-push:
-	gh auth status
-	gh repo create {{PROJECT_NAME}} --public
+	gh repo create {{PROJECT_NAME}} --public --homepage https://actuaristai.github.io/{{PROJECT_NAME}} --description "{{DESCRIPTION}}"
 	git add .
 	git commit -m 'feat: add dvc and qmd initialisations'
-	just init-
 	git push -u origin develop
 	git checkout -b main
 	git push -u origin main
@@ -98,18 +99,48 @@ init-pre-commit:
 # set up dvc
 init-dvc:
 	uv run dvc init
-	@echo "To setup dvc remote, enter AZURE_SECRET in environment or .secrets.toml and run: just init-dvc-remote"
+	@echo "To setup dvc remote, enter DVC_SECRET in environment or .secrets.toml and run: just init-dvc-remote"
 
 
-# set up dvc remote. ensure AZURE_SECRET is in environment or in .secrets.toml file
+# set up dvc remote. ensure DVC_SECRET is in environment or in .secrets.toml file
 init-dvc-remote DVC_REMOTE_NAME DVC_REMOTE DVC_SECRET:
 	#!{{POWERSHELL_SHEBANG}}
 	echo "initializing dvc into {{DVC_REMOTE}}"
 	uv run dvc remote add -d {{DVC_REMOTE_NAME}} --local {{DVC_REMOTE}}
 	uv run dvc remote modify {{DVC_REMOTE_NAME}} --local connection_string '{{DVC_SECRET}}'
 
+# Initialise blank gh-pages branch for publishing
+init-gh-pages:
+	git checkout --orphan gh-pages
+	echo n | git reset --hard # make sure all changes are committed before running this! # no as it asks do delete erroneous docs directory
+	git commit --allow-empty -m "feat: Initialising gh-pages branch"  --no-verify
+	git push origin gh-pages
+	git checkout develop
 
+# Continuous deployment functions
+# ------------------------------------------
 
+# publish to github pages
+cd-publish:
+	# bug workaround for lack of pre-commit in gh-pages branch
+	$env:PRE_COMMIT_ALLOW_NO_CONFIG = "1"; uv run quarto publish gh-pages
+
+# release version with tag (only for maintainers with merge permissions). Usage: just cd-release 'yyyy.mm.dd'
+cd-release VERSION:
+	git checkout -b release-{{VERSION}} develop
+	uv run python bump_version.py {{VERSION}}
+	uv sync
+	uv run cz changelog --incremental
+	git commit -a -m "chore: Bumped version number to {{VERSION}}"
+	git checkout main
+	git merge --no-ff release-{{VERSION}}
+	git push
+	git tag -a {{VERSION}} -m "add version tag"
+	git push origin {{VERSION}}
+	git checkout develop
+	git merge --no-ff main
+	git branch -d release-{{VERSION}}
+	git push
 
 # Other - adhoc useful commands
 # ------------------------------------------
@@ -132,32 +163,3 @@ dvc-pull:
 dvc-add NEWFILE:
 	uv run dvc import-url {{NEWFILE}} data/01_raw 
 
-# release version with tag (only for maintainers with merge permissions). Usage: just cd-release 'yyyy.mm.dd'
-cd-release VERSION:
-	git checkout -b release-{{VERSION}} develop
-	uv run python bump_version.py {{VERSION}}
-	uv sync
-	uv run cz changelog --incremental
-	git commit -a -m "chore: Bumped version number to {{VERSION}}" --no-verify
-	git checkout main
-	git merge --no-ff release-{{VERSION}}
-	git tag -a {{VERSION}} -m "add version tag"
-	git push origin {{VERSION}}
-	git push
-	git checkout develop
-	git merge --no-ff main
-	git branch -d release-{{VERSION}}
-	git push
-
-# publish to github pages
-cd-publish:
-	# bug workaround to uninstall pre-commit before publishing
-	$env:PRE_COMMIT_ALLOW_NO_CONFIG = "1"; uv run quarto publish gh-pages
-
-# Initialise blank gh-pages branch for publishing
-init-gh-pages:
-	git checkout --orphan gh-pages
-	echo n | git reset --hard # make sure all changes are committed before running this! # no as it asks do delete erroneous docs directory
-	git commit --allow-empty -m "feat: Initialising gh-pages branch"  --no-verify
-	git push origin gh-pages
-	git checkout develop
