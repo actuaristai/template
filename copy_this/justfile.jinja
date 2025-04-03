@@ -4,7 +4,9 @@
 set shell:= ["pwsh", "-c"]
 
 PROJECT_NAME:= "{{project_name}}"
-REMOTE_REPO := "{{remote_repository}}"{% raw %}
+REMOTE_REPO := "{{remote_repository}}"
+DESCRIPTION := "{{project_short_description}}"
+{% raw %}
 
 
 POWERSHELL_SHEBANG := if os() == 'windows' {
@@ -77,7 +79,7 @@ init-git:
 
 # create github repository and push initial git to remote
 init-git-push:
-	gh repo create {{PROJECT_NAME}} --public
+	gh repo create {{PROJECT_NAME}} --public --homepage https://actuaristai.github.io/{{PROJECT_NAME}} --description "{{DESCRIPTION}}"
 	git add .
 	git commit -m 'feat: add dvc and qmd initialisations'
 	git push -u origin develop

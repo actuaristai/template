@@ -5,6 +5,7 @@ set shell:= ["pwsh", "-c"]
 
 PROJECT_NAME:= "template"
 REMOTE_REPO := "git@github.com:actuaristai/template.git"
+DESCRIPTION := "Purpose of this repository is to provide a template to use for new repositories using my preferred tooling and best practices."
 
 
 POWERSHELL_SHEBANG := if os() == 'windows' {
@@ -77,7 +78,7 @@ init-git:
 
 # create github repository and push initial git to remote
 init-git-push:
-	gh repo create {{PROJECT_NAME}} --public
+	gh repo create {{PROJECT_NAME}} --public --homepage https://actuaristai.github.io/{{PROJECT_NAME}} --description "{{DESCRIPTION}}"
 	git add .
 	git commit -m 'feat: add dvc and qmd initialisations'
 	git push -u origin develop
