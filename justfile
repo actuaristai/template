@@ -42,16 +42,18 @@ docs: _docs-build
 
 # Lint using ruff
 lint: 
-	uv run ruff check src/{{PROJECT_NAME}} --fix
-	uv run ruff check tests --fix
+	uv run --only-group lint ruff check src/{{PROJECT_NAME}} --fix
+	uv run --only-group lint ruff check tests --fix
 
 # test using pytest
 test:
-	uv run pytest --cov-report term-missing --cov={{PROJECT_NAME}} -v -p no:faulthandler -W ignore::DeprecationWarning --verbose --doctest-modules
+	uv run --only-group test pytest --cov-report term-missing --cov={{PROJECT_NAME}} -v -p no:faulthandler -W ignore::DeprecationWarning --verbose --doctest-modules
+	uv run --only-group test pytest --cov-report term-missing --cov=tests -v -p no:faulthandler -W ignore::DeprecationWarning --verbose --doctest-modules
 
 # reproduce dvc pipeline
 run:
 	uv run dvc repro
+	# uv run dvc push
 
 # update template using copier. optional: use other copier options like vcs-ref=branch 
 update-template *COPIER_OPTIONS:
@@ -75,11 +77,9 @@ init-git:
 
 # create github repository and push initial git to remote
 init-git-push:
-	gh auth status
 	gh repo create {{PROJECT_NAME}} --public
 	git add .
 	git commit -m 'feat: add dvc and qmd initialisations'
-	just init-
 	git push -u origin develop
 	git checkout -b main
 	git push -u origin main
@@ -98,16 +98,15 @@ init-pre-commit:
 # set up dvc
 init-dvc:
 	uv run dvc init
-	@echo "To setup dvc remote, enter AZURE_SECRET in environment or .secrets.toml and run: just init-dvc-remote"
+	@echo "To setup dvc remote, enter DVC_SECRET in environment or .secrets.toml and run: just init-dvc-remote"
 
 
-# set up dvc remote. ensure AZURE_SECRET is in environment or in .secrets.toml file
+# set up dvc remote. ensure DVC_SECRET is in environment or in .secrets.toml file
 init-dvc-remote DVC_REMOTE_NAME DVC_REMOTE DVC_SECRET:
 	#!{{POWERSHELL_SHEBANG}}
 	echo "initializing dvc into {{DVC_REMOTE}}"
 	uv run dvc remote add -d {{DVC_REMOTE_NAME}} --local {{DVC_REMOTE}}
 	uv run dvc remote modify {{DVC_REMOTE_NAME}} --local connection_string '{{DVC_SECRET}}'
-
 
 # Initialise blank gh-pages branch for publishing
 init-gh-pages:
@@ -120,13 +119,18 @@ init-gh-pages:
 # Continuous deployment functions
 # ------------------------------------------
 
+# publish to github pages
+cd-publish:
+	# bug workaround for lack of pre-commit in gh-pages branch
+	$env:PRE_COMMIT_ALLOW_NO_CONFIG = "1"; uv run quarto publish gh-pages
+
 # release version with tag (only for maintainers with merge permissions). Usage: just cd-release 'yyyy.mm.dd'
 cd-release VERSION:
 	git checkout -b release-{{VERSION}} develop
 	uv run python bump_version.py {{VERSION}}
 	uv sync
 	uv run cz changelog --incremental
-	git commit -a -m "chore: Bumped version number to {{VERSION}}" --no-verify
+	git commit -a -m "chore: Bumped version number to {{VERSION}}"
 	git checkout main
 	git merge --no-ff release-{{VERSION}}
 	git push
@@ -136,15 +140,6 @@ cd-release VERSION:
 	git merge --no-ff main
 	git branch -d release-{{VERSION}}
 	git push
-
-# publish to github pages
-cd-publish:
-	# bug workaround to uninstall pre-commit before publishing
-	$env:PRE_COMMIT_ALLOW_NO_CONFIG = "1"; uv run quarto publish gh-pages
-
-# build python package
-cd-build:
-	uvx --from build pyproject-build --installer uv
 
 # Other - adhoc useful commands
 # ------------------------------------------

@@ -42,12 +42,13 @@ docs: _docs-build
 
 # Lint using ruff
 lint: 
-	uv run ruff check src/{{PROJECT_NAME}} --fix
-	uv run ruff check tests --fix
+	uv run --only-group lint ruff check src/{{PROJECT_NAME}} --fix
+	uv run --only-group lint ruff check tests --fix
 
 # test using pytest
 test:
-	uv run pytest --cov-report term-missing --cov={{PROJECT_NAME}} -v -p no:faulthandler -W ignore::DeprecationWarning --verbose --doctest-modules
+	uv run --only-group test pytest --cov-report term-missing --cov={{PROJECT_NAME}} -v -p no:faulthandler -W ignore::DeprecationWarning --verbose --doctest-modules
+	uv run --only-group test pytest --cov-report term-missing --cov=tests -v -p no:faulthandler -W ignore::DeprecationWarning --verbose --doctest-modules
 
 # reproduce dvc pipeline
 run:
@@ -91,6 +92,7 @@ init-env:
 # pre-commit
 init-pre-commit:
 	uvx pre-commit install --hook-type pre-commit --hook-type commit-msg
+	uvx pre-commit autoupdate
 	uvx pre-commit run --all-files
 
 # set up dvc
@@ -138,10 +140,6 @@ cd-release VERSION:
 	git merge --no-ff main
 	git branch -d release-{{VERSION}}
 	git push
-
-# build python package
-cd-build:
-	uvx --from build pyproject-build --installer uv
 
 # Other - adhoc useful commands
 # ------------------------------------------
